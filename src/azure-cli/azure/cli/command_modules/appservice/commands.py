@@ -110,6 +110,8 @@ def load_command_table(self, _):
 
     appservice_domains = CliCommandType(operations_tmpl='azure.cli.command_modules.appservice.appservice_domains#{}')
 
+    appservice_certificate = CliCommandType(operations_tmpl='azure.cli.command_modules.appservice.appservice_certificate#{}')
+
     with self.command_group('webapp', webapp_sdk) as g:
         g.custom_command('create', 'create_webapp', exception_handler=ex_handler_factory())
         g.custom_command('up', 'webapp_up', exception_handler=ex_handler_factory())
@@ -448,3 +450,8 @@ def load_command_table(self, _):
         g.custom_command('list', 'list_staticsite_users')
         g.custom_command('invite', 'invite_staticsite_users')
         g.custom_command('update', 'update_staticsite_users')
+
+    with self.command_group('appservice certificate order', custom_command_type=appservice_certificate, is_preview=True) as g:
+        g.custom_command('show', 'show_appservice_certificate_order')
+        g.custom_command('list', 'list_appservice_certificate_order')
+        g.custom_command('test', 'test_appservice_certificate_order')
