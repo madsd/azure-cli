@@ -286,6 +286,7 @@ def load_command_table(self, _):
         g.show_command('show', 'get')
         g.generic_update_command('update', custom_func_name='update_app_service_plan', setter_arg_name='app_service_plan',
                                  validator=validate_asp_sku, supports_no_wait=True)
+        g.custom_command('list-skus', 'list_app_service_plan_skus', is_preview=True)
 
     with self.command_group('appservice') as g:
         g.custom_command('list-locations', 'list_locations', transform=transform_list_location_output)

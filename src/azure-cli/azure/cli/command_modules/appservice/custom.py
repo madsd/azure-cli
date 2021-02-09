@@ -1689,6 +1689,38 @@ def list_app_service_plans(cmd, resource_group_name=None):
     return plans
 
 
+def list_app_service_plan_skus(cmd, resource_group_name, name):
+    client = web_client_factory(cmd.cli_ctx)
+    plan = client.app_service_plans.get(resource_group_name, name)
+    if plan is None:
+        raise ResourceNotFoundError('App Service Plan not found.')
+    kind = plan.kind
+    isolated = bool(plan.hosting_environment_profile)
+    skus = client.app_service_plans.get_server_farm_skus(resource_group_name, name)['value']
+    sku_list = []
+    for sku in skus:
+        sku_tier = sku['sku']['tier']
+        if isolated:  # Isolated returns only available skus
+            sku_list.append(sku['sku'])
+        else:
+            if 'HyperV_' in sku_tier or 'LinuxFree' in sku_tier or 'Isolated' in sku_tier:  # Internal or obsolete skus
+                continue
+            if kind == 'functionapp':  # Consumption tier - does not show in get_server_farm_skus list
+                sku_list.append({'name': 'Y1', 'tier': 'Dynamic'})
+                break
+            if 'PremiumV3' in sku_tier and kind == 'windows':  # Windows Container only support Pv3
+                sku_list.append(sku['sku'])
+                continue
+            if 'Elastic' in sku_tier:  # Elastic Premium
+                if kind == 'elastic':
+                    sku_list.append(sku['sku'])
+                continue
+            # Fallback to regular plan
+            if kind in ('app', 'linux'):
+                sku_list.append(sku['sku'])
+    return sku_list
+
+
 def create_app_service_plan(cmd, resource_group_name, name, is_linux, hyper_v, per_site_scaling=False,
                             app_service_environment=None, sku='B1', number_of_workers=None, location=None,
                             tags=None, no_wait=False):

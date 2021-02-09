@@ -81,6 +81,16 @@ examples:
         az appservice plan list --query "[?hostingEnvironmentProfile.name=='<ase-name>']"
 """
 
+helps['appservice plan list-skus'] = """
+type: command
+short-summary: List available skus for a specific app service plans.
+examples:
+  - name: List all App Service plan skus available.
+    text: >
+        az appservice plan list-skus --name MyAppServicePlan --resource-group MyResourceGroup
+"""
+
+
 helps['appservice plan show'] = """
 type: command
 short-summary: Get the app service plans for a resource group or a set of resource groups.
